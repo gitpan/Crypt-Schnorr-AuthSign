@@ -7,7 +7,7 @@
 # redistribute it and/or modify it under the same terms as Perl
 # itself.
 #
-# $Id: AuthSign.pm,v 1.9 2001/05/25 22:14:34 cvs Exp $
+# $Id: AuthSign.pm,v 1.10 2001/05/26 15:54:53 cvs Exp $
 
 use strict;
 
@@ -46,7 +46,7 @@ use vars qw( $VERSION $AUTOLOAD );
 use Crypt::Random qw(makerandom makerandom_itv);
 use Math::Pari qw(PARI Mod component random truncate floor round divisors);
 
-( $VERSION ) = '$Revision: 1.9 $' =~ /\s+([\d\.]+)/;
+( $VERSION ) = '$Revision: 1.10 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   bless { VERSION        =>   "Crypt::Schnorr::AuthSign v$VERSION",
@@ -189,9 +189,8 @@ Crypt::Schnorr::AuthSign - Schnorr Authentication & Signature Protocols
 
 =head1 VERSION
 
- $Revision: 1.9 $
- $Date: 2001/05/25 22:14:34 $
-
+ $Revision: 1.10 $
+ $Date: 2001/05/26 15:54:53 $
 
 =head1 SYNOPSIS
 
@@ -199,32 +198,17 @@ Crypt::Schnorr::AuthSign - Schnorr Authentication & Signature Protocols
 
   $schnorr = new Crypt::Schnorr::AuthSign;
 
-  $schnorr->qsize($bitlength);               # Set size of modulus q
-  $schnorr->version($versionstring);         # Set version string.
-  $schnorr->comment($commentstring);         # Set comment string.
-  $schnorr->debug($boolean);                 # Control debugging output.
-  $schnorr->hash($coderef);                  # Set hash function for signing.
+  $schnorr->qsize(512);                   # Use a 512 bit modulus.
 
-  $schnorr->keygen(%metainfo)                # Create a new keypair.
+  $schnorr->keygen(Name => 'Test User');  # Create a new keypair.
 
-  $key = $schnorr->secretkey();              # Get secret key.
-  $schnorr->secretkey($secretkey);           # Set secret key.
+  $req = $schnorr->authreq();             # Create auth request.
+  $c = $schnorr->challenge($req);         # Generate auth challenge.
+  $response = $schnorr->response($c);     # Respond to a challenge.
+  $auth = $schnorr->verify($response);    # Verify auth response.
 
-  $key = $schnorr->pubkey();                 # Get public key.
-  $schnorr->pubkey($secretkey);              # Set public key.
-
-  $keystr = $key->export();                  # Stringify the key.
-  $key = new Crypt::Schnorr::Key($keystr);   # Snarf a stringified key.
-  $name = $key->meta(Name);                  # Metadata access.
-  $key->meta(Name => 'JAPH');                # Set metadata values.
-
-  $req = $schnorr->authreq();                # Create authorization request.
-  $c = $schnorr->challenge($req);            # Create authorization challenge.
-  $response = $schnorr->response($c);        # Create response to a challenge.
-  $auth = $schnorr->verify($response);       # Verify authentication response.
-
-  $sign = $schnorr->sign($msg);              # Create a signature for $msg.
-  $validity = $schnorr->verify($sign, $msg); # Verify signature on $msg.
+  $sign = $schnorr->sign($m);             # Create a signature for $m.
+  $valid = $schnorr->verify($sign, $m);   # Verify signature on $m.
 
 =head1 DESCRIPTION
 
