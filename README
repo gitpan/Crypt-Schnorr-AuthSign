@@ -1,0 +1,185 @@
+
+     * NAME
+     * SYNOPSIS
+     * DESCRIPTION
+     * CONSTRUCTOR
+     * DATA METHODS
+     * OBJECT METHODS
+     * KEY OBJECT METHODS
+     * AUTHOR
+     * LICENSE
+     * DISCLAIMER
+     _________________________________________________________________
+
+                                     NAME
+
+  Crypt::Schnorr::AuthSign - Schnorr Authentication & Signature Protocols
+     _________________________________________________________________
+
+                                   SYNOPSIS
+
+  use Crypt::Schnorr::AuthSign;
+
+  $schnorr = new Crypt::Schnorr::AuthSign;
+
+  $schnorr->qsize($bitlength);               # Set size of modulus q
+  $schnorr->version($versionstring);         # Set version string.
+  $schnorr->comment($commentstring);         # Set comment string.
+  $schnorr->debug($boolean);                 # Control debugging output.
+  $schnorr->hash($coderef);                  # Set hash function for signing.
+
+  $schnorr->keygen(%metainfo)                # Create a new keypair.
+
+  $key = $schnorr->secretkey();              # Get secret key.
+  $schnorr->secretkey($secretkey);           # Set secret key.
+
+  $key = $schnorr->pubkey();                 # Get public key.
+  $schnorr->pubkey($secretkey);              # Set public key.
+
+  $keystr = $key->export();                  # Stringify the key.
+  $key = new Crypt::Schnorr::Key($keystr);   # Snarf a stringified key.
+  $name = $key->meta(Name);                  # Metadata access.
+  $key->meta(Name => 'JAPH');                # Set metadata values.
+
+  $req = $schnorr->authreq();                # Create authorization request.
+  $c = $schnorr->challenge($req);            # Create authorization challenge.
+  $response = $schnorr->response($c);        # Create response to a challenge.
+  $auth = $schnorr->verify($response);       # Verify authentication response.
+
+  $sign = $schnorr->sign($msg);              # Create a signature for $msg.
+  $validity = $schnorr->verify($sign, $msg); # Verify signature on $msg.
+     _________________________________________________________________
+
+                                  DESCRIPTION
+
+   This module implements the basic Schnorr authentication and signature
+   protocols. It supports zlib compression, Radix64 encoding for exported
+   keys and protocol packets, and a simple method for binding metadata to
+   keys. It does not provide any key management functions or maintain a
+   key database.
+     _________________________________________________________________
+
+                                  CONSTRUCTOR
+
+   new()
+          Creates and returns a new Crypt::Schnorr::AuthSign object.
+     _________________________________________________________________
+
+                                 DATA METHODS
+
+   qsize()
+          Sets the QSIZE instance variable which can be used to change
+          the bitlength of the prime 'q' which is the modulus for most of
+          the calculations in the protocol. A smaller prime, 'p' (q=pk+1)
+          is also used - its bitlength is dependent on the choice of q.
+
+   secretkey()
+          If called without parameters, returns the Crypt::Schnorr::Key
+          object corresponding to the active secret key. If passed a
+          Crypt::Schnorr::Key object, makes that key the currently active
+          secret key.
+
+   pubkey()
+          If called without parameters, returns the Crypt::Schnorr::Key
+          object corresponding to the active public key. If passed a
+          Crypt::Schnorr::Key object, makes that key the currently active
+          public key.
+
+   version()
+          Sets the VERSION instance variable which can be used to change
+          the Version: string on the generated protocol packets to
+          whatever you like. If called without parameters, simply returns
+          the value of the VERSION instance variable.
+
+   comment()
+          Sets the COMMENT instance variable which can be used to change
+          the Comment: string on the generated protocol packets to
+          whatever you like. If called without parameters, simply returns
+          the value of the COMMENT instance variable.
+
+   debug()
+          Sets the DEBUG instance variable which causes the module to
+          emit debugging information if set to a true value. If called
+          without parameters, simply returns the value of the DEBUG
+          instance variable.
+
+   hash()
+          Sets or fetches the HASH instance variable - a coderef. The
+          referenced routine should compute a message digest of it's
+          first argument and return the digest as a decimal or hex
+          number.
+     _________________________________________________________________
+
+                                OBJECT METHODS
+
+   keygen(%metainfo)
+          Generates new public key parameters, creates a new keypair, and
+          binds the name/value pairs of %metainfo with it. Sets the
+          active secret and public keys to the generated keypair. Returns
+          undef if there was an error, otherwise returns a filehandle
+          that reports the progress of the key generation process.
+
+   authreq()
+          Creates and returns an authorization request. Saves parameters
+          associated with the request for use in the rest of the
+          authorization protocol.
+
+   challenge($authreq)
+          Generates and returns a challenge to the authorization request
+          in $authreq, and saves the request parameters for use in the
+          rest of the authorization protocol.
+
+   response($challenge)
+          Generates and returns a response to the authorization challenge
+          in $challenge, using some of the information saved by the last
+          call to authreq().
+
+   sign($message)
+          Computes a message digest of $message, and returns a signature
+          on this message digest. The message digest is computed using
+          the default hash routine (SHA1 with Digest::SHA1) or the hash
+          routine set with the last call to hash().
+
+   verify($response)
+          Attempts to verify the response packet $response against the
+          currently active public key, which should previously have been
+          set by a call to pubkey() or some other method. Returns true
+          iff the authorization succeeded.
+     _________________________________________________________________
+
+                              KEY OBJECT METHODS
+
+   new($keypacket)
+          Creates a new Crypt::Schnorr::Key object and initializes it
+          from the key information in $keypacket. The $keypacket argument
+          is required.
+
+   export()
+          Returns a Radix64 encoded representation of the key.
+
+   meta()
+          Allows metadata access. Provide a label to retrieve the value
+          associated with it, provide a label/value pair and it will be
+          associated with the key, replacing the old value if metadata
+          with the specified label already exists. If called without
+          parameters, will return a list containing all metadata
+          key/value pairs.
+     _________________________________________________________________
+
+                                    AUTHOR
+
+   Crypt::Schnorr::AuthSign is Copyright (c) 2001 Ashish Gulhati
+   <hash@netropolis.org>. All Rights Reserved.
+     _________________________________________________________________
+
+                                    LICENSE
+
+   This code is free software; you can redistribute it and/or modify it
+   under the same terms as Perl itself.
+     _________________________________________________________________
+
+                                  DISCLAIMER
+
+   This is free software. If it breaks, you own both parts.
+
+
